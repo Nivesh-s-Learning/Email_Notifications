@@ -1,9 +1,10 @@
 name: Monitor Organization Commit Activity
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Run daily at midnight UTC (adjust as needed)
-  workflow_dispatch:
+    push:
+      branches:
+        - main  # Trigger workflow on push events to the main branch
+    workflow_dispatch:
 
 jobs:
   monitor_commit_activity:
