@@ -7,39 +7,38 @@ on:
     workflow_dispatch:
 
 jobs:
-  monitor_commit_activity:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Fetch Organization Members
-        id: fetch_members
-        run: |
-          members=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                    https://api.github.com/orgs/Nivesh-s-Learning/members | \
-                    jq -r '.[].login')
-          echo "::set-output name=members::$members"
-        
-      - name: Iterate Over Members and Repositories
-        id: iterate_members
-        run: |
-          members=(${{ steps.fetch_members.outputs.members }})
-          for member in "${members[@]}"; do
-            repositories=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                            https://api.github.com/users/$member/repos | \
-                            jq -r '.[].full_name')
-            echo "Repositories for $member: $repositories"
-            for repo in $repositories; do
-              last_commit_date=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                  https://api.github.com/repos/$repo/commits | \
-                                  jq -r '.[0].commit.author.date')
-              current_date=$(date +%s)
-              time_diff=$((current_date - $(date --date="$last_commit_date" +%s)))
-              echo "Time difference for $repo: $time_diff seconds"
-              # Add logic to send email notification based on time difference
-              if [[ $time_diff -gt 60 ]]; then
-                echo "Sending email notification for $repo"
-                # Implement email sending logic (e.g., using SMTP)
-                # Example: echo "No commits in $repo for more than 1 minute" | mail -s "Commit Activity Alert" user@example.com
-              fi
-            done
-          done
+            monitor_commit_activity:
+              runs-on: ubuntu-latest
+          
+              steps:
+                - name: Fetch Organization Members
+                  id: fetch_members
+                  run: |
+                    members=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_PAT }}" \
+                              https://api.github.com/orgs/YOUR_ORGANIZATION/members | \
+                              jq -r '.[].login')
+                    echo "::set-output name=members::$members"
+                  
+                - name: Iterate Over Members and Repositories
+                  id: iterate_members
+                  run: |
+                    members=(${{ steps.fetch_members.outputs.members }})
+                    for member in "${members[@]}"; do
+                      repositories=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_PAT }}" \
+                                      https://api.github.com/users/$member/repos | \
+                                      jq -r '.[].full_name')
+                      echo "Repositories for $member: $repositories"
+                      while IFS= read -r repo; do
+                        last_commit_date=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_PAT }}" \
+                                            https://api.github.com/repos/$repo/commits | \
+                                            jq -r '.[0].commit.author.date')
+                        current_date=$(date +%s)
+                        time_diff=$((current_date - $(date --date="$last_commit_date" +%s)))
+                        echo "Time difference for $repo: $time_diff seconds"
+                        # Add logic to send email notification based on time difference
+                        if [[ $time_diff -gt 60 ]]; then
+                          echo "Sending email notification for $repo"
+                          # Implement email sending logic (e.g., using SMTP)
+                        fi
+                      done <<< "$repositories"
+                    done
