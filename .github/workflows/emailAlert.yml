@@ -14,10 +14,19 @@ jobs:
                 - name: Fetch Organization Members
                   id: fetch_members
                   run: |
-                    members=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                              https://api.github.com/orgs/Nivesh-s-Learning/members | \
-                              jq -r '.[].login')
-                    echo "::set-output name=members::$members"
+                    members=()
+                    page=1
+                    while true; do
+                      response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                                 "https://api.github.com/orgs/Nivesh-s-Learning/members?page=$page&per_page=100")
+                      current_members=$(echo "$response" | jq -r '.[].login')
+                      members+=($current_members)
+                      if [[ -z $current_members ]]; then
+                        break
+                      fi
+                      ((page++))
+                    done
+                    echo "::set-output name=members::${members[@]}"
                   
                 - name: Iterate Over Members and Get Latest Commit
                   id: iterate_members
