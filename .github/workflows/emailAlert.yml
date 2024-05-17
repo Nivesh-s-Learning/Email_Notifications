@@ -26,7 +26,7 @@ jobs:
                       fi
                       ((page++))
                     done
-                    echo "name=members::${members[@]}" >> GITHUB_OUTPUT
+                    echo "::set-output name=members::${members[@]}"
                   
                 - name: Iterate Over Members and Get Latest Commit
                   id: iterate_members
