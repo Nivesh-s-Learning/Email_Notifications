@@ -15,7 +15,7 @@ jobs:
                   id: fetch_members
                   run: |
                     members=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                              https://api.github.com/orgs/YOUR_ORGANIZATION/members | \
+                              https://api.github.com/orgs/Nivesh-s-Learning/members | \
                               jq -r '.[].login')
                     echo "::set-output name=members::$members"
                   
