@@ -14,7 +14,7 @@ jobs:
                 - name: Fetch Organization Members
                   id: fetch_members
                   run: |
-                    members=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_PAT }}" \
+                    members=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
                               https://api.github.com/orgs/YOUR_ORGANIZATION/members | \
                               jq -r '.[].login')
                     echo "::set-output name=members::$members"
@@ -24,12 +24,12 @@ jobs:
                   run: |
                     members=(${{ steps.fetch_members.outputs.members }})
                     for member in "${members[@]}"; do
-                      repositories=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_PAT }}" \
+                      repositories=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
                                       https://api.github.com/users/$member/repos | \
                                       jq -r '.[].full_name')
                       echo "Repositories for $member: $repositories"
                       while IFS= read -r repo; do
-                        last_commit_date=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_PAT }}" \
+                        last_commit_date=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
                                             https://api.github.com/repos/$repo/commits | \
                                             jq -r '.[0].commit.author.date')
                         current_date=$(date +%s)
