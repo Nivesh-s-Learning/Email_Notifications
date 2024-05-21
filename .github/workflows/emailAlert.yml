@@ -13,7 +13,7 @@ jobs:
               steps:
                 
                 - name: Fetch Organization Members and Get Latest Commit
-                  id: fetch_members_and_commits
+                  id: fetch_members
                   run: |
                     members=()
                     page=1
