@@ -39,6 +39,7 @@ jobs:
                       echo "Latest commit by $member: $latest_commit"
                     done  
                       # Add logic to calculate time difference and send email notification based on your requirements
+                    
 
                 - name: Fetch Email IDs for Members
                   id: fetch_emails
