@@ -11,45 +11,6 @@ jobs:
               runs-on: ubuntu-latest
           
               steps:
-                - name: Fetch Organization Members
-                  id: fetch_members
-                  run: |
-                    members=()
-                    page=1
-                    while true; do
-                      response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                 "https://api.github.com/orgs/Nivesh-s-Learning/members?page=$page&per_page=100")
-                      current_members=$(echo "$response" | jq -r '.[].login')
-                      members+=($current_members)
-                      if [[ -z $current_members ]]; then
-                        break
-                      fi
-                      ((page++))
-                    done
-                    echo "::set-output name=members::${members[@]}"
-                 
-                - name: Fetch Email IDs for Members
-                  id: fetch_emails
-                  run: |
-                        members=(${{ steps.fetch_members.outputs.members }})
-                        emails=()
-                        for member in "${members[@]}"; do
-                          response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                     "https://api.github.com/users/$member")
-                            echo $response
-                          if [[ ! "$response" =~ "email" ]]; then
-                            echo "Error retrieving email for user: $member"
-                          else
-                            email=$(echo "$response" | jq -r '.email')
-                            if [ "$email" != "null" ]; then
-                              emails+=("$email")
-                            else
-                              echo "Email not found for user: $member"
-                            fi
-                          fi
-                        done
-                        echo "::set-output name=emails::${emails[@]}"
-
                 - name: Send Email Notifications
                   uses: dawidd6/action-send-mail@v3
                   with:
