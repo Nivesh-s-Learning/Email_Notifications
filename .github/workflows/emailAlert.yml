@@ -43,12 +43,21 @@ jobs:
                 - name: Fetch Email IDs for Members
                   id: fetch_emails
                   run: |
-                    members=(${{ steps.fetch_members.outputs.members }})
-                    emails=()
-                    for member in "${members[@]}"; do
-                      email=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                            "https://api.github.com/users/$member" | \
-                            jq -r '.email')
-                    emails+=($email)
-                    done
-                    echo "::set-output name=emails::${emails[@]}"
+                        members=(${{ steps.fetch_members.outputs.members }})
+                        emails=()
+                        for member in "${members[@]}"; do
+                          response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                                     "https://api.github.com/users/$member")
+                          if [[ ! "$response" =~ "email" ]]; then
+                            echo "Error retrieving email for user: $member"
+                          else
+                            email=$(echo "$response" | jq -r '.email')
+                            if [ "$email" != "null" ]; then
+                              emails+=("$email")
+                            else
+                              echo "Email not found for user: $member"
+                            fi
+                          fi
+                        done
+                        echo "::set-output name=emails::${emails[@]}"
+                    
