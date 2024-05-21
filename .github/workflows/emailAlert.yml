@@ -54,7 +54,7 @@ jobs:
                           else
                             email=$(echo "$response" | jq -r '.email')
                             if [ "$email" != "null" ]; then
-                              emails+=("$email")
+                              emails+=("$email" + ",")
                             else
                               echo "Email not found for user: $member"
                             fi
