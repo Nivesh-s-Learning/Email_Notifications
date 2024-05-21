@@ -48,6 +48,7 @@ jobs:
                         for member in "${members[@]}"; do
                           response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
                                      "https://api.github.com/users/$member")
+                            echo $response
                           if [[ ! "$response" =~ "email" ]]; then
                             echo "Error retrieving email for user: $member"
                           else
