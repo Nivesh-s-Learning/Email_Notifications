@@ -70,7 +70,7 @@ jobs:
                     username: ${{ secrets.SMTP_USERNAME }}
                     password: ${{ secrets.SMTP_PASSWORD }}
                     subject: "Test Mail"
-                    to: ${{ steps.fetch_emails.outputs.emails }}
+                    to: mitulgarg2000@gmail.com
                     from: sharmanivesh08@gmail.com
                     body: |
                         Did you get this mail?                    
