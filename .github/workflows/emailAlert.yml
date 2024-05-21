@@ -11,34 +11,31 @@ jobs:
               runs-on: ubuntu-latest
           
               steps:
-                - name: Fetch Organization Members
-                  id: fetch_members
+                
+                - name: Fetch Organization Members and Get Latest Commit
+                  id: fetch_members_and_commits
                   run: |
                     members=()
                     page=1
                     while true; do
                       response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                 "https://api.github.com/orgs/Nivesh-s-Learning/members?page=$page&per_page=100")
+                       "https://api.github.com/orgs/Nivesh-s-Learning/members?page=$page&per_page=100")
                       current_members=$(echo "$response" | jq -r '.[].login')
-                      members+=($current_members)
+                      for member in $current_members; do
+                        latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                              "https://api.github.com/users/$member/events" | \
+                              jq -r 'map(select(.type=="PushEvent" and .created_at | fromdateiso8601 < now - 86400)) | .[0].created_at')
+                        if [ ! -z "$latest_commit" ]; then
+                          members+=($member)
+                          echo "Latest commit by $member: $latest_commit"
+                        fi
+                      done
                       if [[ -z $current_members ]]; then
                         break
                       fi
                       ((page++))
                     done
                     echo "::set-output name=members::${members[@]}"
-                  
-                - name: Iterate Over Members and Get Latest Commit
-                  id: iterate_members
-                  run: |
-                    members=(${{ steps.fetch_members.outputs.members }})
-                    for member in "${members[@]}"; do
-                      latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                      "https://api.github.com/users/$member/events" | \
-                                      jq -r 'map(select(.type=="PushEvent")) | .[0].created_at')
-                      echo "Latest commit by $member: $latest_commit"
-                    done  
-                      # Add logic to calculate time difference and send email notification based on your requirements
 
                 - name: Fetch Email IDs for Members
                   id: fetch_emails
