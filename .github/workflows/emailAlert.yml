@@ -51,17 +51,3 @@ jobs:
                     emails+=($email)
                     done
                     echo "::set-output name=emails::${emails[@]}"
-
-                # - name: Send Email if Latest commit not has happened in last 24 hours
-                #   uses: dawidd6/action-send-mail@v3
-                #   with:
-                #     server_address: smtp.gmail.com 
-                #     server_port: 587  
-                #     username: ${{ secrets.SMTP_USERNAME }}  
-                #     password: ${{ secrets.SMTP_PASSWORD }}
-                #     from: sharmanivesh08@gmail.com
-                #     subject: "Latest Commit Info"
-                #     body: "There have been no commits in the last 1 minute."
-                #     to: niveshtnp@gmail.com
-                        
-                #         done
