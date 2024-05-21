@@ -36,7 +36,8 @@ jobs:
                       latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
                                       "https://api.github.com/users/$member/events" | \
                                       jq -r 'map(select(.type=="PushEvent")) | .[0].created_at')
-                      echo "Latest commit by $member: $latest_commit"
+                    done  
+                    echo "Latest commit by $member: $latest_commit"
                       # Add logic to calculate time difference and send email notification based on your requirements
 
                 - name: Fetch Email IDs for Members
