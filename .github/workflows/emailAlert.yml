@@ -1,89 +1,93 @@
 name: Monitor Organization Commit Activity
 
 on:
-    push:
-      branches:
-        - main  # Trigger workflow on push events to the main branch
-    workflow_dispatch:
+  push:
+    branches:
+      - main  # Trigger workflow on push events to the main branch
+  workflow_dispatch:
 
 jobs:
-            monitor_commit_activity:
-              runs-on: ubuntu-latest
-          
-              steps:
-                - name: Fetch Organization Members
-                  id: fetch_members
-                  run: |
-                    members=()
-                    page=1
-                    while true; do
-                      response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                 "https://api.github.com/orgs/Nivesh-s-Learning/members?page=$page&per_page=100")
-                      current_members=$(echo "$response" | jq -r '.[].login')
-                      members+=($current_members)
-                      if [[ -z $current_members ]]; then
-                        break
-                      fi
-                      ((page++))
-                    done
-                    echo "::set-output name=members::${members[@]}"
-                  
-                - name: Iterate Over Members and Get Latest Commit
-                  id: iterate_members
-                  run: |
-                        members=(${{ steps.fetch_members.outputs.members }})
-                        inactive_members=()
-                        current_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                        for member in "${members[@]}"; do
-                          latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                    "https://api.github.com/users/$member/events" | \
-                                    jq -r 'map(select(.type=="PushEvent")) | .[0].created_at')
-                          if [ "$latest_commit" != "null" ]; then
-                            commit_time=$(date -d "$latest_commit" +%s)
-                            current_time_epoch=$(date -d "$current_time" +%s)
-                            time_diff=$(( (current_time_epoch - commit_time) / 3600 ))
-                            if [ $time_diff -ge 24 ]; then
-                              inactive_members+=("$member")
-                            fi
-                          echo "Latest commit by $member: $latest_commit"
-                          else
-                           inactive_members+=("$member")
-                           echo "No recent commits found for $member"
-                          fi
-                        done
-                        echo "::set-output name=inactive_members::${inactive_members[@]}"
+  monitor_commit_activity:
+    runs-on: ubuntu-latest
 
-                - name: Fetch Email IDs for Members
-                  id: fetch_emails
-                  run: |
-                        members=(${{ steps.iterate_members.outputs.inactive_members }})
-                        emails=()
-                        for member in "${members[@]}"; do
-                          response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                                     "https://api.github.com/users/$member")
-                            echo $response
-                          if [[ ! "$response" =~ "email" ]]; then
-                            echo "Error retrieving email for user: $member"
-                          else
-                            email=$(echo "$response" | jq -r '.email')
-                            if [ "$email" != "null" ]; then
-                              emails+=("$email ,")
-                            else
-                              echo "Email not found for user: $member"
-                            fi
-                          fi
-                        done
-                        echo "::set-output name=emails::${emails[@]}"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-                - name: Send Email Notifications
-                  uses: dawidd6/action-send-mail@v3
-                  with:
-                    server_address: smtp.gmail.com
-                    server_port: 587
-                    username: ${{ secrets.SMTP_USERNAME }}
-                    password: ${{ secrets.SMTP_PASSWORD }}
-                    subject: "Please commit everyday"
-                    to: ${{ join(steps.fetch_emails.outputs.emails, ',') }}
-                    from: sharmanivesh08@gmail.com
-                    body: |
-                        Please commit everyday.                    
+      - name: Fetch Organization Members
+        id: fetch_members
+        run: |
+          members=()
+          page=1
+          while true; do
+            response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                       "https://api.github.com/orgs/Nivesh-s-Learning/members?page=$page&per_page=100")
+            current_members=$(echo "$response" | jq -r '.[].login')
+            if [[ -z $current_members ]]; then
+              break
+            fi
+            members+=($current_members)
+            ((page++))
+          done
+          echo "Fetched members: ${members[@]}"
+          echo "::set-output name=members::$(IFS=,; echo "${members[*]}")"
+
+      - name: Iterate Over Members and Get Latest Commit
+        id: iterate_members
+        run: |
+          members=(${{ steps.fetch_members.outputs.members }})
+          echo "Members to iterate: ${members[@]}"
+          inactive_members=()
+          current_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          for member in "${members[@]}"; do
+            latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                          "https://api.github.com/users/$member/events" | \
+                          jq -r 'map(select(.type=="PushEvent")) | .[0].created_at')
+            if [ "$latest_commit" != "null" ]; then
+              commit_time=$(date -d "$latest_commit" +%s)
+              current_time_epoch=$(date -d "$current_time" +%s)
+              time_diff=$(( (current_time_epoch - commit_time) / 3600 ))
+              if [ $time_diff -ge 24 ]; then
+                inactive_members+=("$member")
+              fi
+              echo "Latest commit by $member: $latest_commit"
+            else
+              inactive_members+=("$member")
+              echo "No recent commits found for $member"
+            fi
+          done
+          echo "Inactive members: ${inactive_members[@]}"
+          echo "::set-output name=inactive_members::$(IFS=,; echo "${inactive_members[*]}")"
+
+      - name: Fetch Email IDs for Members
+        id: fetch_emails
+        run: |
+          members=(${{ steps.iterate_members.outputs.inactive_members }})
+          echo "Members to fetch emails: ${members[@]}"
+          emails=()
+          for member in "${members[@]}"; do
+            response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                       "https://api.github.com/users/$member")
+            echo "Response for $member: $response"
+            email=$(echo "$response" | jq -r '.email')
+            if [ "$email" != "null" ] && [ "$email" != "" ]; then
+              emails+=("$email")
+            else
+              echo "Email not found for user: $member"
+            fi
+          done
+          echo "Emails: ${emails[@]}"
+          echo "::set-output name=emails::$(IFS=,; echo "${emails[*]}")"
+
+      - name: Send Email Notifications
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Please commit everyday"
+          to: ${{ steps.fetch_emails.outputs.emails }}
+          from: sharmanivesh08@gmail.com
+          body: |
+            Please commit everyday.
