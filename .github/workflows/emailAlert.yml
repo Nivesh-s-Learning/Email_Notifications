@@ -31,27 +31,27 @@ jobs:
                 - name: Iterate Over Members and Get Latest Commit
                   id: iterate_members
                   run: |
-                    members=(${{ steps.fetch_members.outputs.members }})
-                    inactive_members=()
-                    current_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                    for member in "${members[@]}"; do
-                      latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
+                        members=(${{ steps.fetch_members.outputs.members }})
+                        inactive_members=()
+                        current_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                        for member in "${members[@]}"; do
+                          latest_commit=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
                                     "https://api.github.com/users/$member/events" | \
                                     jq -r 'map(select(.type=="PushEvent")) | .[0].created_at')
-                    if [ "$latest_commit" != "null" ]; then
-                      commit_time=$(date -d "$latest_commit" +%s)
-                      current_time_epoch=$(date -d "$current_time" +%s)
-                      time_diff=$(( (current_time_epoch - commit_time) / 3600 ))
-                      if [ $time_diff -ge 24 ]; then
-                        inactive_members+=("$member")
-                      fi
-                      echo "Latest commit by $member: $latest_commit"
-                    else
-                      inactive_members+=("$member")
-                      echo "No recent commits found for $member"
-                    fi
-                    done
-                    echo "::set-output name=inactive_members::${inactive_members[@]}"
+                          if [ "$latest_commit" != "null" ]; then
+                            commit_time=$(date -d "$latest_commit" +%s)
+                            current_time_epoch=$(date -d "$current_time" +%s)
+                            time_diff=$(( (current_time_epoch - commit_time) / 3600 ))
+                            if [ $time_diff -ge 24 ]; then
+                              inactive_members+=("$member")
+                            fi
+                          echo "Latest commit by $member: $latest_commit"
+                          else
+                           inactive_members+=("$member")
+                           echo "No recent commits found for $member"
+                          fi
+                        done
+                        echo "::set-output name=inactive_members::${inactive_members[@]}"
 
                 - name: Fetch Email IDs for Members
                   id: fetch_emails
