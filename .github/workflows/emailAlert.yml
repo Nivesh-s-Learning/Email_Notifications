@@ -73,7 +73,7 @@ jobs:
                             fi
                           fi
                         done
-                        echo "::set-output name=emails::${emails[@]}"
+                        echo "::set-output name=emails::${emails[@]}" 
 
                 - name: Send Email Notifications
                   uses: dawidd6/action-send-mail@v3
