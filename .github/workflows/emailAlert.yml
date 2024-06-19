@@ -79,9 +79,9 @@ jobs:
                     break
                   fi
                   echo "$commits"
-                  for commit_sha in $response; do
+                  for commit_sha in $commits; do
                     commit=$(echo "$commits_response" | jq -c --arg sha "$commit_sha" '.[] | select(.sha == $sha)')
-                    author=$(echo $commit | jq -r 'author.login')
+                    author=$(echo $commit | jq -r 'author.name')
                     
                    
                   done
