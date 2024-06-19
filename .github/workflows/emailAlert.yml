@@ -61,7 +61,6 @@ jobs:
                 commit_page=1
                 while true; do
                   url="https://api.github.com/repos/Nivesh-s-Learning/$repo/commits?sha=$branch&since=$one_day_ago&page=$commit_page&per_page=100"
-                  echo "Fetching commits from URL: $url"
                   response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" "$url")
                   
                   
@@ -76,8 +75,9 @@ jobs:
                   fi
 
                   for commit in "${commits[@]}"; do
-                      
+                    
                     author=$(echo $commit | jq -r '.author.login')
+                    echo "Author: $author"
                     if [[ -n "$author" && " ${members[@]} " =~ " ${author} " ]]; then
                       echo "Commit found for $author in $repo/$branch"
                       # Remove member from the array if commit found
