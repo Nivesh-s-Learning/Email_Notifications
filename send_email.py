@@ -27,7 +27,8 @@ def send_email(to_emails, subject, body):
         msg.attach(MIMEText(body, 'plain'))
 
         # Send the email
-        server.send_message(msg)
+        # server.send_message(msg)
+        server.sendmail(from_email, to_emails, msg.as_string())
         server.quit()
     except Exception as e:
         print(f"Error sending email: {str(e)}")
@@ -38,4 +39,4 @@ if __name__ == "__main__":
     print(f"Sending email to: {to_emails}")
     subject = "Please commit everyday"
     body = "Please commit everyday."
-    send_email(["sharmanivesh08@gmail.com"], subject, body)
+    send_email(to_emails, subject, body)
