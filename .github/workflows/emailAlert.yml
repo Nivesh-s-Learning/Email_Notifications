@@ -72,13 +72,13 @@ jobs:
                     break
                   fi
                   
-                  commits=($(echo "$response" | jq -r '.[] | @base64'))
+                  commits=($(echo "$response" | jq -r '.[]))
 
                   if [[ ${#commits[@]} -eq 0 ]]; then
                     echo "No commits found in response for branch: $branch"
                     break
                   fi
-                  echo "$commits"
+                  echo "Commits are: $commits"
                   for commit_base64 in "${commits[@]}"; do
                     commit=$(echo "$commit_base64" | base64 -d)
                     echo "$commit"
