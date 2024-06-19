@@ -33,7 +33,7 @@ def send_email(to_emails, subject, body):
         print(f"Error sending email: {str(e)}")
 
 if __name__ == "__main__":
-    to_emails = os.getenv('mails')
+    to_emails = os.getenv('EMAILS')
     # Print the email addresses for log in github actions
     print(f"Sending email to: {to_emails}")
     subject = "Please commit everyday"
