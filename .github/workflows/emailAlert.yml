@@ -113,7 +113,8 @@ jobs:
               echo "Email not found for user: $member"
             fi
           done
-          echo "EMAILS=${emails[*]}" >> $GITHUB_ENV
+          EMAILS=$(IFS=, ; echo "${emails[*]}")
+          echo "EMAILS=$EMAILS" >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v2
