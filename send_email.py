@@ -22,7 +22,7 @@ def send_email(to_emails, subject, body):
         # Create the email
         msg = MIMEMultipart()
         msg['From'] = from_email
-        msg['To'] = ', '.join(to_emails)
+        msg['To'] = [', '.join(to_emails)]
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
 
@@ -34,7 +34,7 @@ def send_email(to_emails, subject, body):
         print(f"Error sending email: {str(e)}")
 
 if __name__ == "__main__":
-    to_emails = ['sharmanivesh08@gmail.com', 'gs0801cs191057@sgsitsindore.in']
+    to_emails = os.getenv('EMAILS')
     # Print the email addresses for log in github actions
     print(f"Sending email to: {to_emails}")
     subject = "Please commit everyday"
