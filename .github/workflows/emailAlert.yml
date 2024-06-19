@@ -77,6 +77,12 @@ jobs:
                     break
                   fi
 
+                  for commit in $commits; do
+                    echo "Current commit is: $commit"
+                    author=$(echo $commit | jq -r '.author.login')
+                    echo "Current author is: $author"
+                    
+                  done
                   ((commit_page++))
                 done
               done
