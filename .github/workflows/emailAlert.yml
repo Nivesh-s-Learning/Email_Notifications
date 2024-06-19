@@ -114,7 +114,6 @@ jobs:
             fi
           done
           echo "EMAILS=${emails[*]}" >> $GITHUB_ENV
-          echo "$emails"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -123,6 +122,7 @@ jobs:
 
       - name: Send Email Notifications
         run: |
+          echo "Sending emails to: $EMAILS"
           python send_email.py
         env:
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}

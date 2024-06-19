@@ -35,7 +35,7 @@ def send_email(to_emails, subject, body):
 if __name__ == "__main__":
     to_emails = os.getenv('mails')
     # Print the email addresses for log in github actions
-    print(f"Sending email to: {', '.join(to_emails)}")
+    print(f"Sending email to: {to_emails}")
     subject = "Please commit everyday"
     body = "Please commit everyday."
     send_email(to_emails, subject, body)
