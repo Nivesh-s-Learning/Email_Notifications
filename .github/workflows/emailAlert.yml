@@ -34,6 +34,7 @@ jobs:
           echo "One day ago: $one_day_ago"
 
           for repo in "${repos[@]}"; do
+            echo "Current repo: $repo"
             page=1
             while true; do
               branches=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
