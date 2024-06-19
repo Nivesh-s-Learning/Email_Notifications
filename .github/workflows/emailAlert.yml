@@ -71,7 +71,7 @@ jobs:
                     echo "No commits found for branch: $branch"
                     break
                   fi
-
+                  echo "Response is: $response"
                   commits=$(echo "$response" | jq -c '.[]' || echo "[]")
                   if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
@@ -79,9 +79,9 @@ jobs:
                   echo "Commit array: $commits"
                   echo "End"
                   for commit in $commits; do
-                    echo "Current commit is: $commit"
+                    
                     author=$(echo $commit | jq -r '.commit.author.name')
-                    echo "Current author is: $author"
+                    
                    
                   done
                   ((commit_page++))
