@@ -72,7 +72,7 @@ jobs:
                     break
                   fi
                   
-                  commits=($(echo "$response" | jq -r '.[]))
+                  commits=($(echo "$response" | jq -c '.[]' || echo "[]"))
 
                   if [[ ${#commits[@]} -eq 0 ]]; then
                     echo "No commits found in response for branch: $branch"
@@ -80,10 +80,7 @@ jobs:
                   fi
                   echo "Commits are: $commits"
                   for commit_base64 in "${commits[@]}"; do
-                    commit=$(echo "$commit_base64" | base64 -d)
-                    echo "$commit"
-                    author=$(echo $commit | jq -r 'author.name')
-                    echo "$author"
+                    
                     
                    
                   done
