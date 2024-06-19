@@ -23,7 +23,7 @@ jobs:
       - name: Iterate Over Repositories and Branches
         id: iterate_repos
         run: |
-          repos=(Email_Notifications mitul-testing)
+          repos=(Email_Notification mitul-testing)
           members=($MEMBERS)
           echo "Repositories to iterate: ${repos[@]}"
           echo "Members to check: ${members[@]}"
@@ -47,8 +47,13 @@ jobs:
                 break
               fi
 
+              if [[ "$response" == "[]" ]]; then
+                echo "No branches found for repository: $repo"
+                break
+              fi
+
               branches=$(echo "$response" | jq -r '.[].name' || echo "[]")
-              if [[ -z "$branches" ]]; then
+              if [[ -z "$branches" || "$branches" == "[]" ]]; then
                 echo "No branches found for repository: $repo"
                 break
               fi
@@ -62,13 +67,13 @@ jobs:
                   response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" "$url")
                   echo "Commits response for branch $branch: $response"
                   
-                  if [[ -z "$response" ]]; then
+                  if [[ -z "$response" || "$response" == "[]" ]]; then
                     echo "No commits found for branch: $branch"
                     break
                   fi
 
                   commits=$(echo "$response" | jq -c '.[]' || echo "[]")
-                  if [[ -z "$commits" ]]; then
+                  if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
 
