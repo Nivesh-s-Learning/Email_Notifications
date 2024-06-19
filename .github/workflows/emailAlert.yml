@@ -23,7 +23,7 @@ jobs:
       - name: Iterate Over Repositories and Branches
         id: iterate_repos
         run: |
-          repos=(Email_Notification mitul-testing)
+          repos=(Email_Notifications mitul-testing)
           members=($MEMBERS)
           echo "Repositories to iterate: ${repos[@]}"
           echo "Members to check: ${members[@]}"
