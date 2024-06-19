@@ -76,7 +76,8 @@ jobs:
                   if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
-
+                  echo "Commit array: $commits"
+                  echo "End"
                   for commit in $commits; do
                     echo "Current commit is: $commit"
                     author=$(echo $commit | jq -r '.commit.author.name')
