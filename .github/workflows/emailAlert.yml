@@ -79,7 +79,7 @@ jobs:
                   echo "Commits are: $commits"
                   for commit in "${commits[@]}"; do
                     
-                    author=$(echo $commit | jq -r '.commit.author.name')
+                    author=$(echo $commit | jq -r '.author.login')
                     echo "Authors: $author"
                    
                   done
