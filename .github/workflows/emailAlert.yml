@@ -81,11 +81,7 @@ jobs:
                     echo "Current commit is: $commit"
                     author=$(echo $commit | jq -r '.commit.author.name')
                     echo "Current author is: $author"
-                    if [[ " ${members[@]} " =~ " ${author} " ]]; then
-                      echo "Commit found for $author in $repo/$branch"
-                      # Remove member from the array if commit found
-                      members=(${members[@]/$author})
-                    fi
+                   
                   done
                   ((commit_page++))
                 done
