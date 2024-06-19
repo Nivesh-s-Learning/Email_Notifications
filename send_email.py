@@ -18,11 +18,11 @@ def send_email(to_emails, subject, body):
         server = smtplib.SMTP(smtp_server, smtp_port)
         server.starttls()
         server.login(username, password)
-
+        print(type(to_emails))
         # Create the email
         msg = MIMEMultipart()
         msg['From'] = from_email
-        msg['To'] = [', '.join(to_emails)]
+        msg['To'] = ', '.join(to_emails)
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
 
