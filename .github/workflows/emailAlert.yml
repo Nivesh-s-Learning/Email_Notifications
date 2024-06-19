@@ -72,7 +72,7 @@ jobs:
                     break
                   fi
                   
-                  commits=($(echo "$commits_response" | jq -r '.[].author'))
+                  commits=($(echo "$response" | jq -r '.[].author'))
 
                   if [[ ${#commits[@]} -eq 0 ]]; then
                     echo "No commits found in response for branch: $branch"
