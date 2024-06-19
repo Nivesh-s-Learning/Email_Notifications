@@ -72,16 +72,16 @@ jobs:
                     break
                   fi
                   
-                  commits=($(echo "$response" | jq -r '.[].author'))
+                  commits=($(echo "$response" | jq -r '.[].sha'))
 
                   if [[ ${#commits[@]} -eq 0 ]]; then
                     echo "No commits found in response for branch: $branch"
                     break
                   fi
                   echo "$commits"
-                  for commit in $response; do
-                    
-                    author=$(echo $commit | jq -r '.commit.author.name')
+                  for commit_sha in $response; do
+                    commit=$(echo "$commits_response" | jq -c --arg sha "$commit_sha" '.[] | select(.sha == $sha)')
+                    author=$(echo $commit | jq -r 'author.login')
                     
                    
                   done
