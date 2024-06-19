@@ -71,17 +71,17 @@ jobs:
                     echo "No commits found for branch: $branch"
                     break
                   fi
-                  echo "Response is: $response"
+                  
                   commits=($(echo "$response" | jq -c '.[]' || echo "[]"))
                   if [[ ${#commits[@]} -eq 0 ]]; then
                     echo "No commits found in response for branch: $branch"
                     break
                   fi
-
+                  echo "$commits"
                   for commit in $response; do
                     
                     author=$(echo $commit | jq -r '.commit.author.name')
-                    echo "Authors: $author"
+                    
                    
                   done
                   ((commit_page++))
