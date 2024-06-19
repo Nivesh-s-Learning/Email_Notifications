@@ -58,7 +58,7 @@ jobs:
                 break
               fi
 
-              for branch in $branches; do
+              for branch in "${branches[@]}"; do
                 
                 commit_page=1
                 while true; do
