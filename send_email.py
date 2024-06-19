@@ -38,4 +38,4 @@ if __name__ == "__main__":
     print(f"Sending email to: {to_emails}")
     subject = "Please commit everyday"
     body = "Please commit everyday."
-    send_email(to_emails, subject, body)
+    send_email(["sharmanivesh08@gmail.com"], subject, body)
