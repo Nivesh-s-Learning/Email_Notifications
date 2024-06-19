@@ -58,7 +58,7 @@ jobs:
                 break
               fi
 
-              for branch in "${branches[@]}"; do
+              for branch in $branches; do
                 
                 commit_page=1
                 while true; do
@@ -108,6 +108,7 @@ jobs:
             fi
           done
           echo "EMAILS=${emails[*]}" >> $GITHUB_ENV
+          echo "$emails"
 
       - name: Set up Python
         uses: actions/setup-python@v2
