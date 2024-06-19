@@ -37,10 +37,16 @@ jobs:
             echo "Current repo: $repo"
             page=1
             while true; do
-              response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                "https://api.github.com/repos/Nivesh-s-Learning/$repo/branches?page=$page&per_page=100")
+              url="https://api.github.com/repos/Nivesh-s-Learning/$repo/branches?page=$page&per_page=100"
+              echo "Fetching branches from URL: $url"
+              response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" "$url")
               echo "Branches response: $response"
-              
+
+              if [[ "$response" == *"404 Not Found"* ]]; then
+                echo "Error: Repository $repo not found or authentication issue. Check if the repository name is correct and the token has access."
+                break
+              fi
+
               branches=$(echo "$response" | jq -r '.[].name' || echo "[]")
               if [[ -z "$branches" ]]; then
                 echo "No branches found for repository: $repo"
@@ -51,13 +57,18 @@ jobs:
                 echo "Checking commits for branch: $branch"
                 commit_page=1
                 while true; do
-                  response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
-                    "https://api.github.com/repos/Nivesh-s-Learning/$repo/commits?sha=$branch&since=$one_day_ago&page=$commit_page&per_page=100")
+                  url="https://api.github.com/repos/Nivesh-s-Learning/$repo/commits?sha=$branch&since=$one_day_ago&page=$commit_page&per_page=100"
+                  echo "Fetching commits from URL: $url"
+                  response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" "$url")
                   echo "Commits response for branch $branch: $response"
                   
+                  if [[ -z "$response" ]]; then
+                    echo "No commits found for branch: $branch"
+                    break
+                  fi
+
                   commits=$(echo "$response" | jq -c '.[]' || echo "[]")
                   if [[ -z "$commits" ]]; then
-                    echo "No commits found for branch: $branch"
                     break
                   fi
 
