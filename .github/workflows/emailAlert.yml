@@ -72,12 +72,12 @@ jobs:
                     break
                   fi
                   
-                  commits=$(echo "$response" | jq -c '.[] // []')
+                  commits=$(echo "$response" | jq -c '.[]' || echo "[]")
                   if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
                   echo "Commits are: $commits"
-                  for commit in $commits; do
+                  for commit in "${commits[@]}"; do
                     
                     author=$(echo $commit | jq -r '.commit.author.name')
                     echo "Authors: $author"
