@@ -34,13 +34,13 @@ jobs:
           echo "One day ago: $one_day_ago"
 
           for repo in "${repos[@]}"; do
-            echo "Current repo: $repo"
+            
             page=1
             while true; do
               url="https://api.github.com/repos/Nivesh-s-Learning/$repo/branches?page=$page&per_page=100"
               echo "Fetching branches from URL: $url"
               response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" "$url")
-              echo "Branches response: $response"
+              
 
               if [[ "$response" == *"404 Not Found"* ]]; then
                 echo "Error: Repository $repo not found or authentication issue. Check if the repository name is correct and the token has access."
@@ -52,43 +52,36 @@ jobs:
                 break
               fi
 
-              branches=($(echo "$response" | jq -r '.[].name'))
-              if [[ ${#branches[@]} -eq 0 ]]; then
+              branches=$(echo "$response" | jq -r '.[].name' || echo "[]")
+              if [[ -z "$branches" || "$branches" == "[]" ]]; then
                 echo "No branches found for repository: $repo"
                 break
               fi
 
-              for branch in "${branches[@]}"; do
-                echo "Checking commits for branch: $branch"
+              for branch in $branches; do
+                
                 commit_page=1
                 while true; do
                   url="https://api.github.com/repos/Nivesh-s-Learning/$repo/commits?sha=$branch&since=$one_day_ago&page=$commit_page&per_page=100"
                   echo "Fetching commits from URL: $url"
                   response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" "$url")
-                  echo "Commits response for branch $branch: $response"
+                  
                   
                   if [[ -z "$response" || "$response" == "[]" ]]; then
                     echo "No commits found for branch: $branch"
                     break
                   fi
-
-                  commits=($(echo "$response" | jq -c '.[]' || echo "[]"))
-                  if [[ ${#commits[@]} -eq 0 ]]; then
-                    echo "No commits found in response for branch: $branch"
+                  
+                  commits=$(echo "$response" | jq -c '.[]' || echo "[]")
+                  if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
-
-                  for commit in "${commits[@]}"; do
-                    if [[ $(echo $commit | jq '.author') != "null" ]]; then
-                      author=$(echo $commit | jq -r '.author.login')
-                      if [[ " ${members[@]} " =~ " ${author} " ]]; then
-                        echo "Commit found for $author in $repo/$branch"
-                        # Remove member from the array if commit found
-                        members=(${members[@]/$author})
-                      fi
-                    else
-                      echo "Commit author is null for commit: $commit"
-                    fi
+                  echo "Commits are: $commits"
+                  for commit in $commits; do
+                    
+                    author=$(echo $commit | jq -r '.commit.author.name')
+                    echo "Authors: $author"
+                   
                   done
                   ((commit_page++))
                 done
