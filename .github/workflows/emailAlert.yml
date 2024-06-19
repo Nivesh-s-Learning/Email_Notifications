@@ -114,7 +114,7 @@ jobs:
             fi
           done
           echo "EMAILS=${emails[*]}" >> $GITHUB_ENV
-          echo ${{env.EMAILS}}
+          echo "$emails"
 
       - name: Set up Python
         uses: actions/setup-python@v2
