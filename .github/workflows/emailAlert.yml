@@ -72,7 +72,7 @@ jobs:
                     break
                   fi
                   
-                  mapfile -t commits <<< "$(echo "$response" | jq -c '.[]')"
+                  commits=($(echo "$response" | jq -c '.[]' || echo "[]"))
                   if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
