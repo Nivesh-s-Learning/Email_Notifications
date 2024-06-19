@@ -101,6 +101,7 @@ jobs:
         id: fetch_emails
         run: |
           inactive_members=($INACTIVE_MEMBERS)
+          echo "$inactive_members"
           emails=()
           for member in "${inactive_members[@]}"; do
             response=$(curl -s -H "Authorization: token ${{ secrets.ACCESS_TOKEN }}" \
