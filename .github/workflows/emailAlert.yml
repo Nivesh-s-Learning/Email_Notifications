@@ -76,12 +76,11 @@ jobs:
                   if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
-                  echo "Commit array: $commits"
-                  echo "End"
-                  for commit in $commits; do
+                
+                  for commit in $response; do
                     
                     author=$(echo $commit | jq -r '.commit.author.name')
-                    
+                    echo "Authors: $author"
                    
                   done
                   ((commit_page++))
