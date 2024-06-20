@@ -73,7 +73,12 @@ jobs:
                   if [[ -z "$commits" || "$commits" == "[]" ]]; then
                     break
                   fi
-
+                  
+                  jq -c "$response" | while read i; do
+                    echo "Single Commit: $i"
+                    echo "Single commit end"
+                  done
+                  
                   for commit in "${commits[@]}"; do
                     echo "$commit"
                     author=$(echo $commit | jq -r '.author.login')
