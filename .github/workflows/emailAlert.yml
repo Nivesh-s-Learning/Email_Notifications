@@ -74,7 +74,7 @@ jobs:
                     break
                   fi
                   
-                  for commit in $(echo "$commits" | jq -c '.[]'); do
+                  for commit in ${commits[@]}; do
                     echo "$commit"
                     author=$(echo $commit | jq -r '.author.login')
                     echo "Author: $author"
