@@ -74,12 +74,7 @@ jobs:
                     break
                   fi
                   
-                  jq -c "$response" | while read i; do
-                    echo "Single Commit: $i"
-                    echo "Single commit end"
-                  done
-                  
-                  for commit in "${commits[@]}"; do
+                  for commit in $(echo "$response" | jq -c '.[]'); do
                     echo "$commit"
                     author=$(echo $commit | jq -r '.author.login')
                     echo "Author: $author"
