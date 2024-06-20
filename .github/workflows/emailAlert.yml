@@ -78,6 +78,7 @@ jobs:
                     
                     author=$(echo $commit | jq -r '.author.login')
                     echo "Author: $author"
+                    echo "AUthor log"
                     if [[ -n "$author" && " ${members[@]} " =~ " ${author} " ]]; then
                       echo "Commit found for $author in $repo/$branch"
                       echo "Previous List: $members"
