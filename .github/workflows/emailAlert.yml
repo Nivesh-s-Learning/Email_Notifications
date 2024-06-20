@@ -75,7 +75,7 @@ jobs:
                   fi
 
                   for commit in "${commits[@]}"; do
-                    
+                    echo "$commit"
                     author=$(echo $commit | jq -r '.author.login')
                     echo "Author: $author"
                     echo "AUthor log"
