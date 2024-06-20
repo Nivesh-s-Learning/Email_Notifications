@@ -81,10 +81,10 @@ jobs:
                     echo "AUthor log"
                     if [[ -n "$author" && " ${members[@]} " =~ " ${author} " ]]; then
                       echo "Commit found for $author in $repo/$branch"
-                      echo "Previous List: $members"
+                      echo "Previous List: ${members[@]}"
                       # Remove member from the array if commit found
                       members=(${members[@]/$author})
-                      echo "List after removing $author : $members"
+                      echo "List after removing $author : ${members[@]}"
                     fi
                    
                   done
