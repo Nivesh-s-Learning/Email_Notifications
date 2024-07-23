@@ -38,5 +38,5 @@ if __name__ == "__main__":
     # Print the email addresses for log in github actions
     print(f"Sending email to: {to_emails}")
     subject = "Please commit everyday"
-    body = "Please commit everyday."
+    body = "commit karo bhai."
     send_email(to_emails, subject, body)
